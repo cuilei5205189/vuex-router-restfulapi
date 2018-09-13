@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VUE RESTful</title>
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" v-model.trim="input">
+        <a href="javascript:;" v-on:click="createHandler">create</a>
+        <ol>
+            <li v-for='(content,index) in contents'>{{content.content}}
+                <a href="javascript:;" v-on:click="deleteHandler(index)">delete</a>
+                <a href="javascript:;">update</a>
+            </li>
+        </ol>
+    </div>
+</body>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js'></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            input: '',
+            contents: 'hello world'
+        },
+        methods: {
+            createHandler() {
+                if (!this.input) { return false }
+                axios.post('http://localhost:3000/posts', { content: this.input }).then((res) => {
+                    console.log(res.data)
+                    this.contents.push(res.data)
+                    this.input = ""
+                })
+            },
+            deleteHandler(index) {
+                let target = this.contents[index]
+                console.log(index)
+                console.log('id', this.contents[index].id);
+
+                axios.delete(`http://localhost:3000/posts/${target.id}`).then(() => {
+                    this.contents = this.contents.filter((ele) => {
+                        if (target.id === ele.id) {
+                            return false
+                        } else {
+                            return true
+                        }
+                    })
+                })
+            }
+        },
+        mounted() {
+            axios.get('http://localhost:3000/posts').then((res) => {
+                this.contents = res.data
+            })
+        }
+    })
+</script>
+
+</html>
