@@ -25,8 +25,24 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js'></script>
 <script>
+    var router = new VueRouter({
+        routers: [
+            {
+                path: '/'
+            },
+            {
+                path: '/:id'
+            },
+            {
+                path: '*',
+                redirect: '/'
+            }
+
+        ]
+    })
     var app = new Vue({
         el: "#app",
+        router: router,
         data: {
             input: '',
             contents: 'hello world'
