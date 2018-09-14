@@ -21,8 +21,7 @@
     var List = {
         data: function () {
             return {
-                input: '',
-                contents: 'hello world'
+                input: ''
             }
         },
         template: `
@@ -44,41 +43,55 @@
                 if (!this.input) { return false }
                 axios.post('http://localhost:3000/posts', { content: this.input }).then((res) => {
                     console.log(res.data)
-                    this.contents.push(res.data)
-                    this.input = ""
+                    this.input = ''
+                    this.$store.commit('ADD_CONTENT', res.data)
                 })
             },
             deleteHandler(index) {
                 let target = this.contents[index]
-                axios.delete(`http://localhost:3000/posts/${target.id}`).then(() => {
-                    this.contents = this.contents.filter((ele) => {
-                        if (target.id === ele.id) {
-                            return false
-                        } else {
-                            return true
-                        }
-                    })
-                })
+                this.$store.dispatch('CONTENT_DELETE', target)
             },
             updateHandler(index) {
                 let target = this.contents[index]
-                // this.$router.push({ path: `/update/${target.id}` })
                 this.$router.push({ name: 'update', params: { id: target.id } })
             }
         },
-        mounted() {
-            axios.get('http://localhost:3000/posts').then((res) => {
-                this.contents = res.data
-            })
+        computed: {
+            contents() {
+                return this.$store.state.contents
+            }
         }
     }
     var Edit = {
         template: `
         <div>
-            <input type="text">
-            <button>update</button>
+            <input type="text" v-model.trim="input">
+            <button v-on:click="updateHandler">update</button>
         </div>
-        `
+        `,
+        computed: {
+            content() {
+                return this.$store.state.contents.find((item) => item.id === this.$route.params.id)
+            }
+        },
+        data: function () {
+            return {
+                input: ''
+            }
+        },
+        mounted() {
+            if (!this.content) return this.$router.replace({ path: '/' })
+            this.input = this.content.content
+        },
+        methods: {
+            updateHandler() {
+                this.$store.dispatch('CONTENT_UPDATE', {
+                    input: this.input, id: this.content.id
+                }).then(() => {
+                    this.$router.push({ path: '/' })
+                })
+            }
+        }
     }
 
     var router = new VueRouter({
@@ -100,9 +113,58 @@
 
         ]
     })
+
+    let store = new Vuex.Store({
+        strict: true,
+        state: {
+            contents: []
+        },
+        mutations: {
+            SET_CONTENTS(state, data) {
+                state.contents = data
+            },
+            ADD_CONTENT(state, data) {
+                state.contents.push(data)
+            },
+            DELETE_CONTENT(state, data) {
+                state.contents.splice(data, 1)
+            },
+            UPDATE_CONTENT(state, { item, input }) {
+                item.content = input
+            }
+        },
+        actions: {
+            CONTENTS_READ(context) {
+                return axios.get('http://localhost:3000/posts').then((res) => {
+                    context.commit('SET_CONTENTS', res.data)
+                })
+            },
+            CONTENT_DELETE(context, x) {
+                let index = context.state.contents.indexOf(x)
+                if (index === -1) return false
+                return axios.delete(`http://localhost:3000/posts/${x.id}`).then((res) => {
+                    context.commit('DELETE_CONTENT', index)
+                })
+            },
+            CONTENT_UPDATE(context, { id, input }) {
+                console.log('update')
+                let item = context.state.contents.find((item) => item.id === id)
+                if (!item) return false
+                return axios.patch(`http://localhost:3000/posts/${item.id}`, { content: input }).then((res) => {
+                    context.commit('UPDATE_CONTENT', { item, input })
+                })
+            }
+        }
+    })
     var app = new Vue({
         el: "#app",
         router,
+        store,
+        mounted() {
+            this.$store.dispatch('CONTENTS_READ').then(() => {
+
+            })
+        }
     })
 </script>
 

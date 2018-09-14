@@ -1,20 +1,16 @@
 {
-    "posts": [
-        {
-            "content": "tes",
-            "id": 6
-        },
-        {
-            "content": "nihao",
-            "id": 7
-        },
-        {
-            "content": "wo",
-            "id": 8
-        },
-        {
-            "content": "ter",
-            "id": 9
-        }
-    ]
+  "posts": [
+    {
+      "content": "cuie",
+      "id": 1
+    },
+    {
+      "content": "sdsdf",
+      "id": 2
+    },
+    {
+      "content": "sdfsf",
+      "id": 3
+    }
+  ]
 }
