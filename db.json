@@ -1,16 +1,20 @@
 {
-  "posts": [
-    {
-      "content": "sdsdf",
-      "id": 2
-    },
-    {
-      "content": "sdfsf",
-      "id": 3
-    },
-    {
-      "content": "hello",
-      "id": 113
-    }
-  ]
+    "posts": [
+        {
+            "content": "sdsdf",
+            "id": 2
+        },
+        {
+            "content": "sdfsf",
+            "id": 3
+        },
+        {
+            "content": "hello",
+            "id": 113
+        },
+        {
+            "content": "hello",
+            "id": 113
+        }
+    ]
 }
